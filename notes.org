@@ -1,0 +1,160 @@
+* Sources of Vagrant boxes
+
+https://github.com/mitchellh/vagrant/wiki/Available-Vagrant-Boxes
+
+http://www.vagrantbox.es/
+
+http://cloud-images.ubuntu.com/vagrant/
+
+* Manual APT installation
+
+These must be installed manually from the command-line, for some
+weird reason.
+
+#+BEGIN_EXAMPLE
+sudo apt-get install ispell
+#+END_EXAMPLE
+
+* Extra post-provisioning steps
+
+** Delete default 'ubuntu' or 'vagrant' user account
+
+* Java Development Kits (JDKs)
+
+** Installing OpenJDK 6 & 7
+
+This is included in my latest provisioning scripts.
+
+#+BEGIN_EXAMPLE
+sudo apt-get install openjdk-6-jdk
+sudo apt-get install openjdk-7-jdk
+#+END_EXAMPLE
+
+** Installing Oracle 6 & 7 JDK
+
+This must be performed manually in a terminal to accept click-through
+license.
+
+From http://www.webupd8.org/2012/01/install-oracle-java-jdk-7-in-ubuntu-via.html
+
+#+BEGIN_EXAMPLE
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java6-installer
+sudo apt-get install oracle-java7-installer
+#+END_EXAMPLE
+
+** List available JDKs
+
+#+BEGIN_EXAMPLE
+update-java-alternatives -l
+#+END_EXAMPLE
+
+** Select a JDK as the default
+
+Pick a name from the list returned by the previous command.
+
+#+BEGIN_EXAMPLE
+sudo update-java-alternatives -s java-1.7.0-openjdk-amd64
+#+END_EXAMPLE
+
+** Set JAVA_HOME automatically for default JDK
+
+From http://serverfault.com/questions/143786/how-to-determine-java-home-on-debian-ubuntu
+
+Add to Bash initialization:
+
+#+BEGIN_EXAMPLE
+export JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+#+END_EXAMPLE
+
+This does not work on OS X.
+
+* Truecrypt helpers
+
+Create the TrueCrypt volume at ~/private-src.tc
+
+Copy these scripts into ~/bin
+
+#+NAME: mount-src
+#+BEGIN_EXAMPLE
+  #!/usr/bin/env bash
+  
+  set -e
+  
+  mkdir -p "$HOME/src"
+  exec truecrypt -t --protect-hidden=no -k '' \
+         "$HOME/private-src.tc" "$HOME/src"
+#+END_EXAMPLE
+
+#+NAME: umount-src
+#+BEGIN_EXAMPLE
+  #!/usr/bin/env bash
+  
+  set -e
+  
+  truecrypt -d "$HOME/private-src.tc"
+  rmdir "$HOME/src"
+#+END_EXAMPLE
+
+* Seed the Maven Cache
+
+** Seed Maven by building Clojure libraries 
+
+#+BEGIN_EXAMPLE
+  mkdir -p "$HOME/opensource"
+  
+  for i in \
+      clojure \
+      algo.generic \
+      algo.monads \
+      core.async \
+      core.cache \
+      core.contracts \
+      core.incubator \
+      core.logic \
+      core.match \
+      core.memoize \
+      core.rrb-vector \
+      core.typed \
+      core.unify \
+      data.avl \
+      data.codec \
+      data.csv \
+      data.finger-tree \
+      data.fressian \
+      data.generators \
+      data.json \
+      data.priority-map \
+      data.xml \
+      data.zip \
+      java.classpath \
+      java.data \
+      java.jdbc \
+      java.jmx \
+      jvm.tools.analyzer \
+      math.combinatorics \
+      math.numeric-tower \
+      test.generative \
+      tools.analyzer \
+      tools.analyzer.jvm \
+      tools.cli \
+      tools.logging \
+      tools.macro \
+      tools.namespace \
+      tools.nrepl \
+      tools.reader \
+      tools.trace
+  do
+      cd "$HOME/opensource"
+      git clone "https://github.com/clojure/$i"
+      cd $i
+      mvn clean install
+      mvn clean
+  done
+#+END_EXAMPLE
+
+** Seed Leiningen with common Clojure libraries
+
+See https://gist.github.com/stuartsierra/8587363
+
