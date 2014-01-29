@@ -3,6 +3,10 @@
 These files use [Vagrant] to create an instance of a virtual machine
 with my preferred software installed on either [VirtualBox] or [AWS].
 
+I publish this repository for **example purposes only**. I do not
+recommend using it as-is. Instead, treat it as a source of ideas for
+creating your own Vagrant setup.
+
 
 [Vagrant]: http://www.vagrantup.com/
 [VirtualBox]: https://www.virtualbox.org/
